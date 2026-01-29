@@ -58,6 +58,11 @@ function renderTopPicks() {
   const topDiv = document.getElementById("topPicks");
   topDiv.innerHTML = "";
 
+  setInterval(() => {
+  updateMarket();
+  updateAIPrediction();
+}, 30000); // every 30 seconds
+
   const topStocks = [...allStocks]
     .sort((a, b) => b.score - a.score)
     .slice(0, 3);
