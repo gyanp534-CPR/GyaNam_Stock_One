@@ -49,19 +49,30 @@
 
   <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
-  new TradingView.widget({
-    "width": "100%",
-    "height": 400,
-    "symbol": "BSE:RELIANCE",
-    "interval": "D",
-    "timezone": "Asia/Kolkata",
-    "theme": "dark",
-    "style": "1",
-    "container_id": "tv-chart"
+let tvWidget;
+function loadChart(symbol) {
+  if (tvWidget) tvWidget.remove();
+
+  tvWidget = new TradingView.widget({
+    width: "100%",
+    height: 400,
+    symbol: "NSE:" + symbol,
+    interval: "D",
+    timezone: "Asia/Kolkata",
+    theme: "dark",
+    style: "1",
+    container_id: "tv-chart"
   });
+}
+
+window.onload = function() {
+  loadChart("RELIANCE");
+};
 </script>
 
+
 </body>
+
 
 
 
