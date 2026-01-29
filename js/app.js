@@ -52,6 +52,9 @@ fetch("data/stocks.json")
 
     renderTopPicks();
     renderStocks(allStocks);
+    updateMarket();
+updateAIPrediction();
+
   });
 
 function renderTopPicks() {
