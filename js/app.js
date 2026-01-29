@@ -20,15 +20,11 @@ function renderWatchlist() {
   div.innerHTML = html;
 }
 
-async function getLivePrice(symbol) {
-  try {
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}.NS`;
-    const res = await fetch(url);
-    const data = await res.json();
-    return data.quoteResponse.result[0].regularMarketPrice;
-  } catch (e) {
-    return null;
-  }
+function getLivePrice(symbol) {
+  return new Promise(resolve => {
+    const base = Math.random() * 2000 + 200;
+    resolve(base.toFixed(2));
+  });
 }
 
 function updateMarket() {
