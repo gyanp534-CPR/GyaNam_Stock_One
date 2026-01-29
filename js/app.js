@@ -1,3 +1,23 @@
+function calculateRSI(prices) {
+  let gains = 0, losses = 0;
+  for (let i = 1; i < prices.length; i++) {
+    let diff = prices[i] - prices[i - 1];
+    if (diff > 0) gains += diff;
+    else losses -= diff;
+  }
+  let rs = gains / (losses || 1);
+  return 100 - (100 / (1 + rs));
+}
+
+function generatePriceHistory(basePrice) {
+  let prices = [basePrice];
+  for (let i = 0; i < 14; i++) {
+    let change = (Math.random() - 0.5) * 20;
+    prices.push(prices[prices.length - 1] + change);
+  }
+  return prices;
+}
+
 let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
 
 function toggleWatchlist(symbol) {
@@ -59,22 +79,38 @@ fetch("data/stocks.json")
   .then(res => res.json())
   .then(stocks => {
     allStocks = stocks.map(stock => {
-      let score = 50;
+      const basePrice = Math.random() * 2000 + 200;
+const history = generatePriceHistory(basePrice);
+const rsi = calculateRSI(history);
 
-      if (stock.change > 2) score += 25;
-      else if (stock.change > 0) score += 15;
-      else score += 5;
+let momentum = history[history.length - 1] - history[0];
 
-      score += Math.floor(Math.random() * 20);
+let score = 50;
 
-      let trend = "Neutral";
-      if (score >= 75) trend = "Bullish";
-      else if (score < 50) trend = "Bearish";
+// RSI logic
+if (rsi < 30) score += 25;        // oversold → bullish
+else if (rsi > 70) score -= 20;   // overbought → bearish
 
-      let signal = "Hold";
-      if (score >= 80) signal = "Strong Buy";
-      else if (score >= 65) signal = "Buy";
-      else if (score < 50) signal = "Sell";
+// Momentum logic
+if (momentum > 0) score += 15;
+else score -= 10;
+
+// Sector bonus (AI bias)
+if (stock.sector === "Banking") score += 5;
+if (stock.sector === "IT") score += 3;
+
+// Final clamp
+score = Math.max(0, Math.min(100, Math.round(score)));
+
+let trend = "Neutral";
+if (score >= 70) trend = "Bullish";
+else if (score <= 40) trend = "Bearish";
+
+let signal = "Hold";
+if (score >= 80) signal = "Strong Buy";
+else if (score >= 65) signal = "Buy";
+else if (score <= 35) signal = "Sell";
+
 
       return { ...stock, score, trend, signal };
     });
