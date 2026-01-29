@@ -89,7 +89,7 @@ fetch("data/stocks.json")
     updateMarket();
     updateAIPrediction();
     renderSectorHeatmap();
-    
+    renderWatchlist();   // 👈 ADD THIS
 
 
   });
