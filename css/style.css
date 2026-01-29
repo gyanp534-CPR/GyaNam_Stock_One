@@ -5,64 +5,63 @@ body {
   padding: 20px;
 }
 
-h1 {
-  margin-bottom: 10px;
+h1, h2 {
+  margin-top: 20px;
+}
+
+.dashboard-box {
+  background: #111a2e;
+  border: 1px solid #1f2a44;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
 input, select, button {
-  padding: 8px;
-  margin: 4px;
-  border-radius: 5px;
+  padding: 8px 12px;
+  border-radius: 6px;
   border: none;
+  outline: none;
 }
 
 button {
+  background: #1f2a44;
+  color: white;
   cursor: pointer;
 }
 
+button:hover {
+  background: #2e3b5c;
+}
+
 .stock {
-  border: 1px solid #1f2a44;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 10px;
   background: #111a2e;
+  border: 1px solid #1f2a44;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
 }
 
-.bullish {
-  color: #00ff9c;
-  font-weight: bold;
-}
-
-.bearish {
-  color: #ff4d4d;
-  font-weight: bold;
-}
-
-.neutral {
-  color: #ffaa00;
-  font-weight: bold;
-}
+.bullish { color: #00ff9c; font-weight: bold; }
+.bearish { color: #ff4d4d; font-weight: bold; }
+.neutral { color: #ffaa00; font-weight: bold; }
 
 .top-picks {
-  border: 2px solid gold;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 10px;
   background: #1a1400;
+  border: 2px solid gold;
+  border-radius: 10px;
+  padding: 10px;
 }
 
 @media (max-width: 768px) {
-  body {
-    padding: 10px;
-  }
-
-  input, select, button {
-    width: 100%;
-    margin-bottom: 5px;
-  }
-
-  .stock {
-    font-size: 14px;
+  .controls {
+    flex-direction: column;
   }
 }
-
