@@ -66,6 +66,8 @@ fetch("data/stocks.json")
     renderAISignals();
     updateMarket();
     updateAIPrediction();
+    renderSectorHeatmap();
+
 
   });
 
@@ -164,6 +166,28 @@ function applyFilters() {
   sell.forEach(s => html += `${s.name} (${s.symbol})<br>`);
 
   div.innerHTML = html;
+}
+
+  function renderSectorHeatmap() {
+  const sectorDiv = document.getElementById("sectorHeatmap");
+  const sectors = {};
+
+  allStocks.forEach(s => {
+    if (!sectors[s.sector]) sectors[s.sector] = { total: 0, bullish: 0 };
+    sectors[s.sector].total++;
+    if (s.trend === "Bullish") sectors[s.sector].bullish++;
+  });
+
+  let html = "";
+  for (let sector in sectors) {
+    const ratio = (sectors[sector].bullish / sectors[sector].total * 100).toFixed(0);
+    const color = ratio > 60 ? "green" : ratio < 40 ? "red" : "orange";
+    html += `<div style="margin:5px;padding:5px;border:1px solid #333;color:${color}">
+      ${sector}: ${ratio}% Bullish
+    </div>`;
+  }
+
+  sectorDiv.innerHTML = html;
 }
 
 }
