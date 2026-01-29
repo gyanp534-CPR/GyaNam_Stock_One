@@ -1,6 +1,8 @@
 [
-  {"name":"Reliance", "symbol":"RELIANCE", "sector":"Infra", "change":1.2},
+  {"name":"Reliance", "symbol":"RELIANCE", "sector":"Energy", "change":1.2},
   {"name":"TCS", "symbol":"TCS", "sector":"IT", "change":-0.5},
   {"name":"HDFC Bank", "symbol":"HDFCBANK", "sector":"Banking", "change":2.3},
-  {"name":"Infosys", "symbol":"INFY", "sector":"IT", "change":0.8}
+  {"name":"Infosys", "symbol":"INFY", "sector":"IT", "change":0.8},
+  {"name":"ICICI Bank", "symbol":"ICICIBANK", "sector":"Banking", "change":1.5},
+  {"name":"Sun Pharma", "symbol":"SUNPHARMA", "sector":"Pharma", "change":-0.3}
 ]
