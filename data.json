@@ -1,0 +1,6 @@
+[
+  {"name":"Reliance", "symbol":"RELIANCE", "sector":"Infra", "change":1.2},
+  {"name":"TCS", "symbol":"TCS", "sector":"IT", "change":-0.5},
+  {"name":"HDFC Bank", "symbol":"HDFCBANK", "sector":"Banking", "change":2.3},
+  {"name":"Infosys", "symbol":"INFY", "sector":"IT", "change":0.8}
+]

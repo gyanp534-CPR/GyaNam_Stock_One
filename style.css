@@ -1,0 +1,17 @@
+body {
+  font-family: Arial;
+  background: #0b1220;
+  color: white;
+  padding: 20px;
+}
+
+.stock {
+  border: 1px solid #1f2a44;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+.bullish { color: #00ff9c; }
+.bearish { color: #ff4d4d; }
+.neutral { color: #ffaa00; }
