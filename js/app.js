@@ -162,7 +162,10 @@ function renderStocks(stocks) {
     let trendClass = stock.trend.toLowerCase();
 
     div.innerHTML = `
-  <h3>${stock.name} (${stock.symbol})</h3>
+  <h3 onclick="loadChart('${stock.symbol}')" style="cursor:pointer;">
+  ${stock.name} (${stock.symbol})
+</h3>
+
   <p>Sector: ${stock.sector}</p><p>AI Score: ${stock.score}</p>
 <p>RSI: ${stock.rsi ? stock.rsi.toFixed(2) : "N/A"}</p>
 <p>Momentum: ${stock.momentum ? stock.momentum.toFixed(2) : "N/A"}</p>
