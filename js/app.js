@@ -124,6 +124,7 @@ function renderStocks(stocks) {
   <p>AI Score: ${stock.score}</p>
   <p class="${trendClass}">Trend: ${stock.trend}</p>
   <p>Signal: ${stock.signal}</p>
+  <p id="price-${stock.symbol}">Loading price...</p>
   <button onclick="toggleWatchlist('${stock.symbol}')">
     ${watchlist.includes(stock.symbol) ? "Remove ⭐" : "Add ⭐"}
   </button>
@@ -139,6 +140,10 @@ getLivePrice(stock.symbol).then(price => {
 
 
     container.appendChild(div);
+    getLivePrice(stock.symbol).then(price => {
+  document.getElementById(`price-${stock.symbol}`).innerText = "Live Price: ₹" + price;
+});
+
   });
 }
 
