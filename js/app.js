@@ -1,4 +1,4 @@
-fetch("data.json")
+fetch("data/stocks.json")
   .then(response => response.json())
   .then(stocks => {
     const container = document.getElementById("stocks");
