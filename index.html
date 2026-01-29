@@ -1,13 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Gyanam - One Love</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
 <body>
-  <h1>🧠 Gyanam – One Love</h1>
+  <h1>🧠 Gyanam – India AI Stock Intelligence</h1>
+
+  <input 
+    type="text" 
+    id="searchBox" 
+    placeholder="Search stock (Reliance, TCS, HDFC...)"
+    style="padding:10px;width:300px;margin-bottom:10px;"
+  >
+
+  <div style="margin-bottom:15px;">
+    <button onclick="filterStocks('ALL')">All</button>
+    <button onclick="filterStocks('Bullish')">Bullish</button>
+    <button onclick="filterStocks('Bearish')">Bearish</button>
+    <button onclick="filterStocks('Strong Buy')">Strong Buy</button>
+  </div>
+
   <div id="stocks"></div>
+
   <script src="js/app.js"></script>
 </body>
-</html>
-
