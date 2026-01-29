@@ -40,12 +40,20 @@ function renderWatchlist() {
   div.innerHTML = html;
 }
 
+let priceMap = {};
+
 function getLivePrice(symbol) {
+  if (!priceMap[symbol]) {
+    priceMap[symbol] = Math.random() * 2000 + 200;
+  }
+
   return new Promise(resolve => {
-    const base = Math.random() * 2000 + 200;
-    resolve(base.toFixed(2));
+    let change = (Math.random() - 0.5) * 5;
+    priceMap[symbol] += change;
+    resolve(priceMap[symbol].toFixed(2));
   });
 }
+
 
 function updateMarket() {
   const nifty = (Math.random() * 200 - 100).toFixed(2); // demo NIFTY change
