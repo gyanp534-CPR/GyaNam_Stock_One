@@ -1,3 +1,14 @@
+async function getLivePrice(symbol) {
+  try {
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}.NS`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.quoteResponse.result[0].regularMarketPrice;
+  } catch (e) {
+    return null;
+  }
+}
+
 function updateMarket() {
   const nifty = (Math.random() * 200 - 100).toFixed(2); // demo NIFTY change
   const sentiment = nifty > 0 ? "Bullish 📈" : "Bearish 📉";
