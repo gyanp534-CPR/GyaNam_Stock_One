@@ -25,8 +25,22 @@ fetch("data/stocks.json")
       return { ...stock, score, trend, signal };
     });
 
+    renderTopPicks();
     renderStocks(allStocks);
   });
+
+function renderTopPicks() {
+  const topDiv = document.getElementById("topPicks");
+  topDiv.innerHTML = "";
+
+  const topStocks = [...allStocks]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+
+  topStocks.forEach(stock => {
+    topDiv.innerHTML += `<p>${stock.name} (${stock.symbol}) - Score: ${stock.score} - <span class="bullish">${stock.signal}</span></p>`;
+  });
+}
 
 function renderStocks(stocks) {
   const container = document.getElementById("stocks");
@@ -36,10 +50,13 @@ function renderStocks(stocks) {
     const div = document.createElement("div");
     div.className = "stock";
 
+    let trendClass = stock.trend.toLowerCase();
+
     div.innerHTML = `
       <h3>${stock.name} (${stock.symbol})</h3>
+      <p>Sector: ${stock.sector}</p>
       <p>AI Score: ${stock.score}</p>
-      <p>Trend: ${stock.trend}</p>
+      <p class="${trendClass}">Trend: ${stock.trend}</p>
       <p>Signal: ${stock.signal}</p>
     `;
 
@@ -53,17 +70,23 @@ function filterStocks(type) {
 }
 
 document.getElementById("searchBox").addEventListener("input", applyFilters);
+document.getElementById("sectorFilter").addEventListener("change", applyFilters);
 
 function applyFilters() {
   let filtered = allStocks;
 
   const searchText = document.getElementById("searchBox").value.toLowerCase();
+  const sector = document.getElementById("sectorFilter").value;
 
   if (searchText) {
     filtered = filtered.filter(stock =>
       stock.name.toLowerCase().includes(searchText) ||
       stock.symbol.toLowerCase().includes(searchText)
     );
+  }
+
+  if (sector !== "ALL") {
+    filtered = filtered.filter(stock => stock.sector === sector);
   }
 
   if (currentFilter !== "ALL") {
