@@ -111,8 +111,15 @@ if (score >= 80) signal = "Strong Buy";
 else if (score >= 65) signal = "Buy";
 else if (score <= 35) signal = "Sell";
 
-
-      return { ...stock, score, trend, signal };
+return { 
+  ...stock, 
+  score, 
+  trend, 
+  signal,
+  rsi,
+  momentum
+};
+;
     });
 
     renderTopPicks();
