@@ -14,11 +14,8 @@
   Calculating AI signals...
 </div>
 
-  <input 
-    type="text" 
-    id="searchBox" 
-    placeholder="Search stock (Reliance, TCS...)"
-  >
+  <div class="controls">
+  <input type="text" id="searchBox" placeholder="Search stock...">
 
   <select id="sectorFilter">
     <option value="ALL">All Sectors</option>
@@ -28,12 +25,11 @@
     <option value="Energy">Energy</option>
   </select>
 
-  <div>
-    <button onclick="filterStocks('ALL')">All</button>
-    <button onclick="filterStocks('Bullish')">Bullish</button>
-    <button onclick="filterStocks('Bearish')">Bearish</button>
-    <button onclick="filterStocks('Strong Buy')">Strong Buy</button>
-  </div>
+  <button onclick="filterStocks('ALL')">All</button>
+  <button onclick="filterStocks('Bullish')">Bullish</button>
+  <button onclick="filterStocks('Bearish')">Bearish</button>
+  <button onclick="filterStocks('Strong Buy')">Strong Buy</button>
+</div>
 
   <h2>🔥 Top AI Picks</h2>
   <div id="topPicks" class="top-picks"></div>
@@ -70,6 +66,7 @@
 </script>
 
 </body>
+
 
 
 
