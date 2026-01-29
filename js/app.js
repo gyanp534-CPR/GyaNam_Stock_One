@@ -163,8 +163,10 @@ function renderStocks(stocks) {
 
     div.innerHTML = `
   <h3>${stock.name} (${stock.symbol})</h3>
-  <p>Sector: ${stock.sector}</p>
-  <p>AI Score: ${stock.score}</p>
+  <p>Sector: ${stock.sector}</p><p>AI Score: ${stock.score}</p>
+<p>RSI: ${stock.rsi ? stock.rsi.toFixed(2) : "N/A"}</p>
+<p>Momentum: ${stock.momentum ? stock.momentum.toFixed(2) : "N/A"}</p>
+
   <p class="${trendClass}">Trend: ${stock.trend}</p>
   <p>Signal: ${stock.signal}</p>
   <p id="price-${stock.symbol}">Loading price...</p>
