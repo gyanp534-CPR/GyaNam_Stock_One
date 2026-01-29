@@ -1,3 +1,25 @@
+let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+
+function toggleWatchlist(symbol) {
+  if (watchlist.includes(symbol)) {
+    watchlist = watchlist.filter(s => s !== symbol);
+  } else {
+    watchlist.push(symbol);
+  }
+  localStorage.setItem("watchlist", JSON.stringify(watchlist));
+  renderStocks(allStocks);
+  renderWatchlist();
+}
+
+function renderWatchlist() {
+  const div = document.getElementById("watchlist");
+  if (!div) return;
+
+  let html = "<b>⭐ My Watchlist:</b><br>";
+  watchlist.forEach(sym => html += sym + "<br>");
+  div.innerHTML = html;
+}
+
 async function getLivePrice(symbol) {
   try {
     const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}.NS`;
