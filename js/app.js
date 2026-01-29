@@ -190,4 +190,19 @@ function applyFilters() {
   sectorDiv.innerHTML = html;
 }
 
+  function renderAISignals() {
+  const div = document.getElementById("aiSignals");
+
+  const strongBuy = allStocks.filter(s => s.signal === "Strong Buy").slice(0, 5);
+  const sell = allStocks.filter(s => s.signal === "Sell").slice(0, 5);
+
+  let html = "<b>🔥 Buy Today:</b><br>";
+  strongBuy.forEach(s => html += `${s.name} (${s.symbol})<br>`);
+
+  html += "<br><b>⚠️ Sell Today:</b><br>";
+  sell.forEach(s => html += `${s.name} (${s.symbol})<br>`);
+
+  div.innerHTML = html;
+}
+
 }
