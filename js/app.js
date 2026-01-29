@@ -1,9 +1,10 @@
-fetch("data/stocks.json")
-  .then(response => response.json())
-  .then(stocks => {
-    const container = document.getElementById("stocks");
+let allStocks = [];
+let currentFilter = "ALL";
 
-    stocks.forEach(stock => {
+fetch("data/stocks.json")
+  .then(res => res.json())
+  .then(stocks => {
+    allStocks = stocks.map(stock => {
       let score = 50;
 
       if (stock.change > 2) score += 25;
@@ -21,17 +22,55 @@ fetch("data/stocks.json")
       else if (score >= 65) signal = "Buy";
       else if (score < 50) signal = "Sell";
 
-      const div = document.createElement("div");
-      div.className = "stock";
-
-      div.innerHTML = `
-        <h3>${stock.name} (${stock.symbol})</h3>
-        <p>AI Score: ${score}</p>
-        <p>Trend: ${trend}</p>
-        <p>Signal: ${signal}</p>
-      `;
-
-      container.appendChild(div);
+      return { ...stock, score, trend, signal };
     });
-  })
-  .catch(error => console.error("Error loading data:", error));
+
+    renderStocks(allStocks);
+  });
+
+function renderStocks(stocks) {
+  const container = document.getElementById("stocks");
+  container.innerHTML = "";
+
+  stocks.forEach(stock => {
+    const div = document.createElement("div");
+    div.className = "stock";
+
+    div.innerHTML = `
+      <h3>${stock.name} (${stock.symbol})</h3>
+      <p>AI Score: ${stock.score}</p>
+      <p>Trend: ${stock.trend}</p>
+      <p>Signal: ${stock.signal}</p>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+function filterStocks(type) {
+  currentFilter = type;
+  applyFilters();
+}
+
+document.getElementById("searchBox").addEventListener("input", applyFilters);
+
+function applyFilters() {
+  let filtered = allStocks;
+
+  const searchText = document.getElementById("searchBox").value.toLowerCase();
+
+  if (searchText) {
+    filtered = filtered.filter(stock =>
+      stock.name.toLowerCase().includes(searchText) ||
+      stock.symbol.toLowerCase().includes(searchText)
+    );
+  }
+
+  if (currentFilter !== "ALL") {
+    filtered = filtered.filter(stock =>
+      stock.signal === currentFilter || stock.trend === currentFilter
+    );
+  }
+
+  renderStocks(filtered);
+}
