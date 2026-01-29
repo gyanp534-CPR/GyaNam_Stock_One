@@ -1,3 +1,28 @@
+function updateMarket() {
+  const nifty = (Math.random() * 200 - 100).toFixed(2); // demo NIFTY change
+  const sentiment = nifty > 0 ? "Bullish 📈" : "Bearish 📉";
+
+  document.getElementById("marketBox").innerHTML = `
+    <b>NIFTY Change:</b> ${nifty} <br>
+    <b>Market Sentiment:</b> ${sentiment}
+  `;
+}
+
+function updateAIPrediction() {
+  const bullishCount = allStocks.filter(s => s.trend === "Bullish").length;
+  const total = allStocks.length;
+  const ratio = (bullishCount / total * 100).toFixed(0);
+
+  let prediction = "Neutral";
+  if (ratio > 60) prediction = "Market likely Bullish Tomorrow 🚀";
+  else if (ratio < 40) prediction = "Market likely Bearish Tomorrow ⚠️";
+
+  document.getElementById("aiPrediction").innerHTML = `
+    <b>Bullish Stocks:</b> ${bullishCount}/${total} <br>
+    <b>AI Outlook:</b> ${prediction}
+  `;
+}
+
 let allStocks = [];
 let currentFilter = "ALL";
 
