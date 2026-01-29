@@ -97,12 +97,21 @@ function renderStocks(stocks) {
     let trendClass = stock.trend.toLowerCase();
 
     div.innerHTML = `
-      <h3>${stock.name} (${stock.symbol})</h3>
-      <p>Sector: ${stock.sector}</p>
-      <p>AI Score: ${stock.score}</p>
-      <p class="${trendClass}">Trend: ${stock.trend}</p>
-      <p>Signal: ${stock.signal}</p>
-    `;
+  <h3>${stock.name} (${stock.symbol})</h3>
+  <p>Sector: ${stock.sector}</p>
+  <p>AI Score: ${stock.score}</p>
+  <p class="${trendClass}">Trend: ${stock.trend}</p>
+  <p>Signal: ${stock.signal}</p>
+  <p id="price-${stock.symbol}">Loading price...</p>
+`;
+getLivePrice(stock.symbol).then(price => {
+  if (price) {
+    document.getElementById(`price-${stock.symbol}`).innerText = "Live Price: ₹" + price;
+  } else {
+    document.getElementById(`price-${stock.symbol}`).innerText = "Price unavailable";
+  }
+});
+
 
     container.appendChild(div);
   });
