@@ -406,6 +406,29 @@ function runBacktest() {
   if (el) el.innerHTML = `<b>Backtest Result:</b><br>Strategy Return: ${profit}%`;
 }
 
+async function signup() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    document.getElementById("authStatus").innerText =
+      "Email aur password dono required hain";
+    return;
+  }
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    document.getElementById("authStatus").innerText = error.message;
+  } else {
+    document.getElementById("authStatus").innerText =
+      "Signup successful ✅ Ab login karo";
+  }
+}
+
 async function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
