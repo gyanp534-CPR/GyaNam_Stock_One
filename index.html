@@ -2,143 +2,90 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Gyanam — Auth Test</title>
+  <title>🧠 Gyanam – India AI Stock Intelligence</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+
   <style>
-    body { font-family: Arial, sans-serif; padding:18px; background:#0f1724; color:#e6eef8; }
-    input { padding:8px; margin:6px 0; width:280px; display:block; }
-    button { padding:8px 12px; margin:6px 6px 6px 0; cursor:pointer; }
-    .dashboard-box { padding:10px; margin:8px 0; background:#0b1220; border:1px solid #233044; border-radius:6px; }
-    h1,h2 { margin:8px 0; color:#bfe3ff; }
-    #authStatus { margin-top:6px; color:#ffd; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+      background:#0f1724;
+      color:#e6eef8;
+    }
+    h1,h2 { color:#bfe3ff; }
+    .dashboard-box {
+      padding:12px;
+      margin:10px 0;
+      background:#0b1220;
+      border:1px solid #233044;
+      border-radius:8px;
+    }
+    .stock {
+      padding:10px;
+      margin:8px 0;
+      border:1px solid #233044;
+      border-radius:6px;
+      background:#0b1220;
+    }
+    button {
+      padding:6px 10px;
+      cursor:pointer;
+      margin-top:4px;
+    }
+    .bullish { color:#4ade80; }
+    .bearish { color:#f87171; }
+    .neutral { color:#facc15; }
+    input, select {
+      padding:6px;
+      margin-right:6px;
+    }
   </style>
 </head>
+
 <body>
 
-<h1>🧠 Gyanam — Auth Test</h1>
+<h1>🧠 Gyanam – India AI Stock Intelligence</h1>
 
-<!-- 🔐 AUTH -->
-<div id="authArea" class="dashboard-box">
-  <h2>🔐 Authentication</h2>
+<h2>📊 Market Index</h2>
+<div id="indexBox" class="dashboard-box"></div>
 
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
+<h2>📈 Market Dashboard</h2>
+<div id="marketBox" class="dashboard-box"></div>
 
-  <button id="btnSignup">Sign Up (Supabase)</button>
-  <button id="btnLogin">Login (Admin / Supabase)</button>
-  <button onclick="login()">Login (Admin / Supabase)</button>
+<h2>🤖 AI Market Prediction</h2>
+<div id="aiPrediction" class="dashboard-box"></div>
 
+<h2>🔮 Tomorrow Outlook</h2>
+<div id="tomorrowPrediction" class="dashboard-box"></div>
 
-  <div id="authStatus">Status: waiting…</div>
+<h2>🔍 Filters</h2>
+<div class="dashboard-box">
+  <input type="text" id="searchBox" placeholder="Search stock">
+  <select id="sectorFilter">
+    <option value="ALL">All Sectors</option>
+    <option value="Banking">Banking</option>
+    <option value="IT">IT</option>
+    <option value="Energy">Energy</option>
+  </select>
 </div>
 
-<!-- 🚀 DASHBOARD -->
-<div id="dashboard" style="display:none;">
-  <button id="btnLogout">Logout</button>
-  <h2>🎉 Dashboard unlocked</h2>
+<h2>🔥 Top AI Picks</h2>
+<div id="topPicks" class="dashboard-box"></div>
 
-  <div class="dashboard-box">You are logged in successfully.</div>
-</div>
+<h2>⭐ Watchlist</h2>
+<div id="watchlist" class="dashboard-box"></div>
 
-<!-- ✅ Supabase JS (ONLY ONCE) -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<h2>⚡ AI Signals Today</h2>
+<div id="aiSignals" class="dashboard-box"></div>
 
-<script>
-/* =========================
-   CONFIG
-========================= */
-const SUPABASE_URL = "https://xfavhimibtbkshzxwyss.supabase.co";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE"; // optional for now
+<h2>🌐 Sector Heatmap</h2>
+<div id="sectorHeatmap" class="dashboard-box"></div>
 
-const ADMIN_EMAIL = "admin@gyanam.ai";
-const ADMIN_PASSWORD = "admin123";
+<h2>📊 All Stocks</h2>
+<div id="stocks"></div>
 
-/* =========================
-   INIT
-========================= */
-const supabase = supabaseJs.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-
-function info(msg){
-  document.getElementById("authStatus").innerText = "Status: " + msg;
-}
-
-function showDashboard(show){
-  document.getElementById("dashboard").style.display = show ? "block" : "none";
-  document.getElementById("authArea").style.display = show ? "none" : "block";
-}
-
-/* =========================
-   LOGIN
-========================= */
-async function loginHandler(){
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  // Admin login (dev)
-  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD){
-    info("Admin login successful ✅");
-    showDashboard(true);
-    return;
-  }
-
-  // Supabase login
-  if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes("PASTE")){
-    info("Supabase anon key missing. Admin only.");
-    return;
-  }
-
-  info("Trying Supabase login…");
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error){
-    info("Login failed: " + error.message);
-  } else {
-    info("Supabase login successful ✅");
-    showDashboard(true);
-  }
-}
-
-/* =========================
-   SIGNUP
-========================= */
-async function signupHandler(){
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  if (!email || !password){
-    info("Email & password required");
-    return;
-  }
-
-  const { error } = await supabase.auth.signUp({ email, password });
-  if (error){
-    info("Signup failed: " + error.message);
-  } else {
-    info("Signup successful — now login");
-  }
-}
-
-/* =========================
-   LOGOUT
-========================= */
-async function logoutHandler(){
-  await supabase.auth.signOut();
-  info("Logged out");
-  showDashboard(false);
-}
-
-/* =========================
-   EVENTS
-========================= */
-document.getElementById("btnLogin").addEventListener("click", loginHandler);
-document.getElementById("btnSignup").addEventListener("click", signupHandler);
-document.getElementById("btnLogout").addEventListener("click", logoutHandler);
-
-info("Ready. Use admin@gyanam.ai / admin123");
-</script>
+<!-- MAIN JS -->
+<script src="app.js"></script>
 
 </body>
 </html>
-
