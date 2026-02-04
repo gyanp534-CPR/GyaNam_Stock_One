@@ -363,3 +363,18 @@ function renderNewsSentiment() {
   `;
 }
 
+function runBacktest() {
+  let profit = 0;
+
+  allStocks.forEach(stock => {
+    if (stock.signal === "Strong Buy") profit += 5;
+    if (stock.signal === "Buy") profit += 2;
+    if (stock.signal === "Sell") profit -= 3;
+  });
+
+  document.getElementById("backtestResult").innerHTML = `
+    <b>Backtest Result:</b><br>
+    Strategy Return: ${profit}%
+  `;
+}
+
