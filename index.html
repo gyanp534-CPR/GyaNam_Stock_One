@@ -4,6 +4,8 @@
 <button onclick="login()">Login</button>
 <div id="authStatus"></div>
 
+<button onclick="logout()">Logout</button>
+
 <div id="dashboard" style="display:none;">
   <!-- 🔽 YAHAN tumhara poora dashboard content rahega -->
 </div>
@@ -88,7 +90,6 @@
 
    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
    <script src="js/app.js"></script>
-
   <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
 let tvWidget;
@@ -114,6 +115,7 @@ window.onload = function() {
 
 
 </body>
+
 
 
 
