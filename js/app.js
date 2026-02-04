@@ -146,6 +146,8 @@ return {
     renderTomorrowPrediction();
     renderIndex();
     renderNewsSentiment();
+    renderAIExplanation(allStocks[0]);
+
 
   });
 
