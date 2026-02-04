@@ -1,3 +1,12 @@
+supabase.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    showDashboard(true);
+    loadWatchlist();
+  } else {
+    showDashboard(false);
+  }
+});
+
 const SUPABASE_URL = "https://xfavhimibtbkshzxwyss.supabase.co";
 const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";
 
@@ -465,12 +474,7 @@ function showDashboard(show) {
   document.getElementById("dashboard").style.display = show ? "block" : "none";
 }
 
-supabase.auth.onAuthStateChange((event, session) => {
-  if (session) {
-    showDashboard(true);
-    loadWatchlist();
-  } else {
-    showDashboard(false);
-  }
-});
+async function logout() {
+  await supabase.auth.signOut();
+}
 
