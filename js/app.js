@@ -1,3 +1,8 @@
+// js/app.js - REPLACE your current file with this exact content
+
+/* --------------------------
+   Utilities & Indicators
+   -------------------------- */
 function calculateRSI(prices) {
   let gains = 0, losses = 0;
   for (let i = 1; i < prices.length; i++) {
@@ -18,6 +23,9 @@ function generatePriceHistory(basePrice) {
   return prices;
 }
 
+/* --------------------------
+   Watchlist (localStorage)
+   -------------------------- */
 let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
 
 function toggleWatchlist(symbol) {
@@ -34,143 +42,154 @@ function toggleWatchlist(symbol) {
 function renderWatchlist() {
   const div = document.getElementById("watchlist");
   if (!div) return;
-
   let html = "<b>⭐ My Watchlist:</b><br>";
   watchlist.forEach(sym => html += sym + "<br>");
   div.innerHTML = html;
 }
 
+/* --------------------------
+   Fake-but-realistic live price engine
+   -------------------------- */
 let priceMap = {};
 
 function getLivePrice(symbol) {
   if (!priceMap[symbol]) {
-    priceMap[symbol] = Math.random() * 2000 + 200;
+    // different base for different symbols for variety
+    priceMap[symbol] = 300 + (symbol.charCodeAt(0) % 1000) + Math.random() * 400;
   }
-
   return new Promise(resolve => {
-    let change = (Math.random() - 0.5) * 5;
-    priceMap[symbol] += change;
+    let change = (Math.random() - 0.5) * 5; // small tick
+    priceMap[symbol] = Math.max(5, priceMap[symbol] + change);
     resolve(priceMap[symbol].toFixed(2));
   });
 }
 
-
+/* --------------------------
+   Market + AI summary updates
+   -------------------------- */
 function updateMarket() {
   const nifty = (Math.random() * 200 - 100).toFixed(2); // demo NIFTY change
   const sentiment = nifty > 0 ? "Bullish 📈" : "Bearish 📉";
-
-  document.getElementById("marketBox").innerHTML = `
-    <b>NIFTY Change:</b> ${nifty} <br>
-    <b>Market Sentiment:</b> ${sentiment}
-  `;
+  const el = document.getElementById("marketBox");
+  if (el) {
+    el.innerHTML = `<b>NIFTY Change:</b> ${nifty} <br><b>Market Sentiment:</b> ${sentiment}`;
+  }
 }
 
 function updateAIPrediction() {
   const bullishCount = allStocks.filter(s => s.trend === "Bullish").length;
-  const total = allStocks.length;
-  const ratio = (bullishCount / total * 100).toFixed(0);
-
+  const total = allStocks.length || 1;
+  const ratio = Math.round((bullishCount / total) * 100);
   let prediction = "Neutral";
   if (ratio > 60) prediction = "Market likely Bullish Tomorrow 🚀";
   else if (ratio < 40) prediction = "Market likely Bearish Tomorrow ⚠️";
-
-  document.getElementById("aiPrediction").innerHTML = `
-    <b>Bullish Stocks:</b> ${bullishCount}/${total} <br>
-    <b>AI Outlook:</b> ${prediction}
-  `;
+  const el = document.getElementById("aiPrediction");
+  if (el) {
+    el.innerHTML = `<b>Bullish Stocks:</b> ${bullishCount}/${total} <br><b>AI Outlook:</b> ${prediction}`;
+  }
 }
 
+/* --------------------------
+   App state
+   -------------------------- */
 let allStocks = [];
 let currentFilter = "ALL";
 
+/* --------------------------
+   Load stocks and compute AI
+   -------------------------- */
 fetch("data/stocks.json")
   .then(res => res.json())
   .then(stocks => {
+    // compute AI values per stock
     allStocks = stocks.map(stock => {
       const basePrice = Math.random() * 2000 + 200;
-const history = generatePriceHistory(basePrice);
-const rsi = calculateRSI(history);
+      const history = generatePriceHistory(basePrice);
+      const rsi = calculateRSI(history);
+      const momentum = history[history.length - 1] - history[0];
 
-let momentum = history[history.length - 1] - history[0];
+      // base score and optional strategy adjustment (if dropdown present)
+      let score = 50;
+      const strategy = document.getElementById("strategyMode")?.value || "balanced";
+      if (strategy === "aggressive") score += 10;
+      if (strategy === "conservative") score -= 5;
 
-let score = 50;
+      // RSI logic
+      if (rsi < 30) score += 25;        // oversold => bullish
+      else if (rsi > 70) score -= 20;   // overbought => bearish
 
-const strategy =
-  document.getElementById("strategyMode")?.value || "balanced";
+      // Momentum logic
+      if (momentum > 0) score += 15;
+      else score -= 10;
 
-if (strategy === "aggressive") score += 10;
-if (strategy === "conservative") score -= 5;
+      // Sector bias
+      if (stock.sector === "Banking") score += 5;
+      if (stock.sector === "IT") score += 3;
 
-// RSI logic
-if (rsi < 30) score += 25;        // oversold → bullish
-else if (rsi > 70) score -= 20;   // overbought → bearish
+      // clamp
+      score = Math.max(0, Math.min(100, Math.round(score)));
 
-// Momentum logic
-if (momentum > 0) score += 15;
-else score -= 10;
+      let trend = "Neutral";
+      if (score >= 70) trend = "Bullish";
+      else if (score <= 40) trend = "Bearish";
 
-// Sector bonus (AI bias)
-if (stock.sector === "Banking") score += 5;
-if (stock.sector === "IT") score += 3;
+      let signal = "Hold";
+      if (score >= 80) signal = "Strong Buy";
+      else if (score >= 65) signal = "Buy";
+      else if (score <= 35) signal = "Sell";
 
-// Final clamp
-score = Math.max(0, Math.min(100, Math.round(score)));
-
-let trend = "Neutral";
-if (score >= 70) trend = "Bullish";
-else if (score <= 40) trend = "Bearish";
-
-let signal = "Hold";
-if (score >= 80) signal = "Strong Buy";
-else if (score >= 65) signal = "Buy";
-else if (score <= 35) signal = "Sell";
-
-return { 
-  ...stock, 
-  score, 
-  trend, 
-  signal,
-  rsi,
-  momentum
-};
-;
+      return {
+        ...stock,
+        score,
+        trend,
+        signal,
+        rsi,
+        momentum
+      };
     });
 
+    // All render calls MUST happen after allStocks is ready
     renderTop10();
     renderStocks(allStocks);
     renderAISignals();
     updateMarket();
     updateAIPrediction();
     renderSectorHeatmap();
-    renderWatchlist();   // 👈 ADD THIS
+    renderWatchlist();
     renderTomorrowPrediction();
     renderIndex();
     renderNewsSentiment();
-    renderAIExplanation(allStocks[0]);
 
+    // default explanation — show first stock explanation
+    if (allStocks.length) {
+      renderAIExplanation(allStocks[0]);
+    }
 
+    // periodic updates
+    setInterval(() => {
+      updateMarket();
+      updateAIPrediction();
+    }, 30000);
+
+  })
+  .catch(err => {
+    console.error("Error loading stocks:", err);
   });
 
-function renderTopPicks() {
-  const topDiv = document.getElementById("topPicks");
-  topDiv.innerHTML = "";
-
-  setInterval(() => {
-  updateMarket();
-  updateAIPrediction();
-}, 30000); // every 30 seconds
-
-  const topStocks = [...allStocks]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
-
-  topStocks.forEach(stock => {
-    topDiv.innerHTML += `<p>${stock.name} (${stock.symbol}) - Score: ${stock.score} - <span class="bullish">${stock.signal}</span></p>`;
-  });
+/* --------------------------
+   Render helpers
+   -------------------------- */
+function renderTop10() {
+  const top10 = [...allStocks].sort((a, b) => b.score - a.score).slice(0, 10);
+  let html = "<b>🏆 Top 10 AI Stocks Today:</b><br>";
+  top10.forEach(s => html += `${s.name} (${s.symbol}) — ${s.score}<br>`);
+  const el = document.getElementById("topPicks");
+  if (el) el.innerHTML = html;
 }
 
 function renderStocks(stocks) {
   const container = document.getElementById("stocks");
+  if (!container) return;
   container.innerHTML = "";
 
   stocks.forEach(stock => {
@@ -180,37 +199,28 @@ function renderStocks(stocks) {
     let trendClass = stock.trend.toLowerCase();
 
     div.innerHTML = `
-  <h3 onclick="loadChart('${stock.symbol}'); renderAIExplanation(${JSON.stringify(stock)})" style="cursor:pointer;">
-
-  ${stock.name} (${stock.symbol})
-</h3>
-
-  <p>Sector: ${stock.sector}</p><p>AI Score: ${stock.score}</p>
-<p>RSI: ${stock.rsi ? stock.rsi.toFixed(2) : "N/A"}</p>
-<p>Momentum: ${stock.momentum ? stock.momentum.toFixed(2) : "N/A"}</p>
-
-  <p class="${trendClass}">Trend: ${stock.trend}</p>
-  <p>Signal: ${stock.signal}</p>
-  <p id="price-${stock.symbol}">Loading price...</p>
-  <button onclick="toggleWatchlist('${stock.symbol}')">
-    ${watchlist.includes(stock.symbol) ? "Remove ⭐" : "Add ⭐"}
-  </button>
-`;
-
-getLivePrice(stock.symbol).then(price => {
-  if (price) {
-    document.getElementById(`price-${stock.symbol}`).innerText = "Live Price: ₹" + price;
-  } else {
-    document.getElementById(`price-${stock.symbol}`).innerText = "Price unavailable";
-  }
-});
-
+      <h3 onclick="loadChart('${stock.symbol}'); renderAIExplanation(${JSON.stringify(stock)})" style="cursor:pointer;">
+        ${stock.name} (${stock.symbol})
+      </h3>
+      <p>Sector: ${stock.sector}</p>
+      <p>AI Score: ${stock.score}</p>
+      <p>RSI: ${stock.rsi ? stock.rsi.toFixed(2) : "N/A"}</p>
+      <p>Momentum: ${stock.momentum ? stock.momentum.toFixed(2) : "N/A"}</p>
+      <p class="${trendClass}">Trend: ${stock.trend}</p>
+      <p>Signal: ${stock.signal}</p>
+      <p id="price-${stock.symbol}">Loading price...</p>
+      <button onclick="toggleWatchlist('${stock.symbol}')">
+        ${watchlist.includes(stock.symbol) ? "Remove ⭐" : "Add ⭐"}
+      </button>
+    `;
 
     container.appendChild(div);
-    getLivePrice(stock.symbol).then(price => {
-  document.getElementById(`price-${stock.symbol}`).innerText = "Live Price: ₹" + price;
-});
 
+    // update live price once per card (no duplicate calls)
+    getLivePrice(stock.symbol).then(price => {
+      const priceEl = document.getElementById(`price-${stock.symbol}`);
+      if (priceEl) priceEl.innerText = "Live Price: ₹" + price;
+    });
   });
 }
 
@@ -219,14 +229,20 @@ function filterStocks(type) {
   applyFilters();
 }
 
-document.getElementById("searchBox").addEventListener("input", applyFilters);
-document.getElementById("sectorFilter").addEventListener("change", applyFilters);
+document.addEventListener("DOMContentLoaded", () => {
+  // attach listeners if elements exist (guard to avoid errors)
+  const searchBox = document.getElementById("searchBox");
+  if (searchBox) searchBox.addEventListener("input", applyFilters);
+
+  const sectorFilter = document.getElementById("sectorFilter");
+  if (sectorFilter) sectorFilter.addEventListener("change", applyFilters);
+});
 
 function applyFilters() {
-  let filtered = allStocks;
+  let filtered = allStocks.slice();
 
-  const searchText = document.getElementById("searchBox").value.toLowerCase();
-  const sector = document.getElementById("sectorFilter").value;
+  const searchText = document.getElementById("searchBox")?.value?.toLowerCase() || "";
+  const sector = document.getElementById("sectorFilter")?.value || "ALL";
 
   if (searchText) {
     filtered = filtered.filter(stock =>
@@ -246,26 +262,31 @@ function applyFilters() {
   }
 
   renderStocks(filtered);
+}
 
-  function renderAISignals() {
+/* --------------------------
+   Signals, Heatmap, Predictions
+   -------------------------- */
+function renderAISignals() {
   const div = document.getElementById("aiSignals");
+  if (!div) return;
 
   const strongBuy = allStocks.filter(s => s.signal === "Strong Buy").slice(0, 5);
   const sell = allStocks.filter(s => s.signal === "Sell").slice(0, 5);
 
   let html = "<b>🔥 Buy Today:</b><br>";
   strongBuy.forEach(s => html += `${s.name} (${s.symbol})<br>`);
-
   html += "<br><b>⚠️ Sell Today:</b><br>";
   sell.forEach(s => html += `${s.name} (${s.symbol})<br>`);
 
   div.innerHTML = html;
 }
 
-  function renderSectorHeatmap() {
+function renderSectorHeatmap() {
   const sectorDiv = document.getElementById("sectorHeatmap");
-  const sectors = {};
+  if (!sectorDiv) return;
 
+  const sectors = {};
   allStocks.forEach(s => {
     if (!sectors[s.sector]) sectors[s.sector] = { total: 0, bullish: 0 };
     sectors[s.sector].total++;
@@ -284,105 +305,89 @@ function applyFilters() {
   sectorDiv.innerHTML = html;
 }
 
-}
 function renderTomorrowPrediction() {
   const bullish = allStocks.filter(s => s.trend === "Bullish").length;
-  const bearish = allStocks.filter(s => s.trend === "Bearish").length;
-  const total = allStocks.length;
-
+  const total = allStocks.length || 1;
   const probability = Math.round((bullish / total) * 100);
 
   let outlook = "Sideways";
   if (probability > 60) outlook = "Bullish 📈";
   else if (probability < 40) outlook = "Bearish 📉";
 
-  document.getElementById("tomorrowPrediction").innerHTML = `
-    <b>Market Outlook:</b> ${outlook}<br>
-    <b>Confidence:</b> ${probability}%
-  `;
+  const el = document.getElementById("tomorrowPrediction");
+  if (el) {
+    el.innerHTML = `<b>Market Outlook:</b> ${outlook}<br><b>Confidence:</b> ${probability}%`;
+  }
 }
 
+/* --------------------------
+   Portfolio Simulator
+   -------------------------- */
 function simulatePortfolio() {
-  const amount = Number(document.getElementById("investmentAmount").value);
+  const amount = Number(document.getElementById("investmentAmount")?.value || 0);
   if (!amount || watchlist.length === 0) {
-    document.getElementById("portfolioResult").innerText =
-      "Enter amount & add stocks to watchlist";
+    document.getElementById("portfolioResult").innerText = "Enter amount & add stocks to watchlist";
     return;
   }
 
   let gain = 0;
   watchlist.forEach(sym => {
     const stock = allStocks.find(s => s.symbol === sym);
+    if (!stock) return;
     if (stock.signal === "Strong Buy") gain += amount * 0.08;
     else if (stock.signal === "Buy") gain += amount * 0.04;
     else if (stock.signal === "Sell") gain -= amount * 0.03;
   });
 
-  document.getElementById("portfolioResult").innerHTML = `
-    <b>Estimated P/L:</b> ₹${gain.toFixed(0)}
-  `;
+  document.getElementById("portfolioResult").innerHTML = `<b>Estimated P/L:</b> ₹${gain.toFixed(0)}`;
 }
 
+/* --------------------------
+   Index, Top picks & Explanation
+   -------------------------- */
 function renderIndex() {
   const nifty = (Math.random() * 200 - 100).toFixed(2);
   const bank = (Math.random() * 200 - 100).toFixed(2);
-
-  document.getElementById("indexBox").innerHTML = `
-    NIFTY: ${nifty} <br>
-    BANKNIFTY: ${bank}
-  `;
-}
-
-function renderTop10() {
-  const top10 = [...allStocks]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 10);
-
-  let html = "<b>🏆 Top 10 AI Stocks Today:</b><br>";
-  top10.forEach(s => {
-    html += `${s.name} (${s.symbol}) — ${s.score}<br>`;
-  });
-
-  document.getElementById("topPicks").innerHTML = html;
+  const el = document.getElementById("indexBox");
+  if (el) el.innerHTML = `NIFTY: ${nifty} <br> BANKNIFTY: ${bank}`;
 }
 
 function renderAIExplanation(stock) {
+  if (!stock) {
+    document.getElementById("aiExplanation") && (document.getElementById("aiExplanation").innerText = "Click any stock to see explanation.");
+    return;
+  }
   let reasons = [];
-
   if (stock.rsi < 30) reasons.push("RSI oversold (bullish signal)");
   if (stock.rsi > 70) reasons.push("RSI overbought (risk)");
   if (stock.momentum > 0) reasons.push("Positive momentum");
   if (stock.momentum < 0) reasons.push("Negative momentum");
   if (stock.sector === "Banking") reasons.push("Strong banking sector bias");
 
-  document.getElementById("aiExplanation").innerHTML = `
+  document.getElementById("aiExplanation") && (document.getElementById("aiExplanation").innerHTML = `
     <b>${stock.name} (${stock.symbol})</b><br>
     Signal: ${stock.signal}<br>
     Reasons:<br>• ${reasons.join("<br>• ")}
-  `;
+  `);
 }
 
+/* --------------------------
+   News, Backtest
+   -------------------------- */
 function renderNewsSentiment() {
   const sentiments = ["Positive 🟢", "Neutral 🟡", "Negative 🔴"];
   const pick = sentiments[Math.floor(Math.random() * sentiments.length)];
-
-  document.getElementById("newsSentiment").innerHTML = `
-    Market News Sentiment: <b>${pick}</b>
-  `;
+  const el = document.getElementById("newsSentiment");
+  if (el) el.innerHTML = `Market News Sentiment: <b>${pick}</b>`;
 }
 
 function runBacktest() {
   let profit = 0;
-
   allStocks.forEach(stock => {
     if (stock.signal === "Strong Buy") profit += 5;
     if (stock.signal === "Buy") profit += 2;
     if (stock.signal === "Sell") profit -= 3;
   });
-
-  document.getElementById("backtestResult").innerHTML = `
-    <b>Backtest Result:</b><br>
-    Strategy Return: ${profit}%
-  `;
+  const el = document.getElementById("backtestResult");
+  if (el) el.innerHTML = `<b>Backtest Result:</b><br>Strategy Return: ${profit}%`;
 }
-
