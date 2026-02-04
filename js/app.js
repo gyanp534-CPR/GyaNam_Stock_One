@@ -2,7 +2,7 @@
  * 🔐 SUPABASE INIT (MUST BE AT TOP)
  *************************************************/
 const SUPABASE_URL = "https://xfavhimibtbkshzxwyss.supabase.co";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_REAL_ANON_KEY_HERE"; // 🔴 REQUIRED
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmYXZoaW1pYnRia3Noenh3eXNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxODAxOTIsImV4cCI6MjA4NTc1NjE5Mn0.wOa0aQyp4kRh8v6ShncJ7fW6nV6hTTpOG4gw61WQrTM"; // 🔴 REQUIRED
 
 const supabase = supabaseJs.createClient(
   SUPABASE_URL,
