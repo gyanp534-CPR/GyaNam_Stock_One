@@ -130,7 +130,7 @@ return {
 ;
     });
 
-    renderTopPicks();
+    renderTop10();
     renderStocks(allStocks);
     renderAISignals();
     updateMarket();
@@ -139,7 +139,7 @@ return {
     renderWatchlist();   // 👈 ADD THIS
     renderTomorrowPrediction();
     renderIndex();
-    renderTop10();
+    
 
 
   });
