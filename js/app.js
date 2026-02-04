@@ -33,7 +33,6 @@ function generatePriceHistory(basePrice) {
 /* --------------------------
    Watchlist (localStorage)
    -------------------------- */
-let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
 
 function toggleWatchlist(symbol) {
   if (watchlist.includes(symbol)) {
@@ -41,7 +40,6 @@ function toggleWatchlist(symbol) {
   } else {
     watchlist.push(symbol);
   }
-  localStorage.setItem("watchlist", JSON.stringify(watchlist));
   renderStocks(allStocks);
   renderWatchlist();
 }
@@ -413,4 +411,52 @@ async function login() {
   } else {
     document.getElementById("authStatus").innerText = "Logged in ✅";
   }
+}
+
+loadWatchlist();
+
+async function getUser() {
+  const { data } = await supabase.auth.getUser();
+  return data.user;
+}
+
+async function loadWatchlist() {
+  const user = await getUser();
+  if (!user) return;
+
+  const { data } = await supabase
+    .from("watchlists")
+    .select("symbol")
+    .eq("user_id", user.id);
+
+  watchlist = data.map(d => d.symbol);
+  renderStocks(allStocks);
+  renderWatchlist();
+}
+
+async function toggleWatchlist(symbol) {
+  const user = await getUser();
+  if (!user) {
+    alert("Please login first");
+    return;
+  }
+
+  if (watchlist.includes(symbol)) {
+    await supabase
+      .from("watchlists")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("symbol", symbol);
+
+    watchlist = watchlist.filter(s => s !== symbol);
+  } else {
+    await supabase
+      .from("watchlists")
+      .insert([{ user_id: user.id, symbol }]);
+
+    watchlist.push(symbol);
+  }
+
+  renderStocks(allStocks);
+  renderWatchlist();
 }
