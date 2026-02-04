@@ -1,8 +1,8 @@
 /*************************************************
- * 🔐 SUPABASE INIT (MUST BE AT TOP)
+ * 🔐 SUPABASE INIT (ONLY ONCE)
  *************************************************/
 const SUPABASE_URL = "https://xfavhimibtbkshzxwyss.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmYXZoaW1pYnRia3Noenh3eXNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxODAxOTIsImV4cCI6MjA4NTc1NjE5Mn0.wOa0aQyp4kRh8v6ShncJ7fW6nV6hTTpOG4gw61WQrTM"; // 🔴 REQUIRED
+const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE"; // keep anon, not service key
 
 const supabase = supabaseJs.createClient(
   SUPABASE_URL,
@@ -13,186 +13,110 @@ const supabase = supabaseJs.createClient(
 const ADMIN_EMAIL = "admin@gyanam.ai";
 const ADMIN_PASSWORD = "admin123";
 
-
 /*************************************************
  * 🌍 GLOBAL STATE
  *************************************************/
 let allStocks = [];
 let watchlist = [];
-let currentFilter = "ALL";
 let priceMap = {};
+
+/*************************************************
+ * 🔐 UI HELPERS
+ *************************************************/
+function setAuthStatus(msg) {
+  document.getElementById("authStatus").innerText = msg;
+}
+
+function showDashboard(show) {
+  document.getElementById("dashboard").style.display = show ? "block" : "none";
+  document.getElementById("authArea").style.display = show ? "none" : "block";
+}
 
 /*************************************************
  * 🔐 AUTH FUNCTIONS
  *************************************************/
 async function signup() {
-  const email = document.getElementById("email").value;
+  const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
 
   if (!email || !password) {
-    document.getElementById("authStatus").innerText =
-      "Email aur password dono required hain";
+    setAuthStatus("Email & password required");
     return;
   }
 
   const { error } = await supabase.auth.signUp({ email, password });
 
-  document.getElementById("authStatus").innerText =
-    error ? error.message : "Signup successful ✅ Ab login karo";
+  if (error) {
+    setAuthStatus(error.message);
+  } else {
+    setAuthStatus("Signup successful ✅ Now login");
+  }
 }
 
 async function login() {
-  const email = document.getElementById("email").value;
+  const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
 
-  // 🛡️ 1️⃣ ADMIN LOGIN (highest priority)
+  // 🔑 Admin login
   if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-    document.getElementById("authStatus").innerText =
-      "Admin login successful ✅ (Dev Mode)";
+    setAuthStatus("Admin login successful ✅");
     showDashboard(true);
+    loadStocks();
     return;
   }
 
-  // 🔐 2️⃣ SUPABASE LOGIN (future-ready)
-  if (typeof supabase !== "undefined") {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (!error) {
-      document.getElementById("authStatus").innerText =
-        "Login successful ✅";
-      return;
-    }
-  }
-
-  // ❌ 3️⃣ FAIL SAFE
-  document.getElementById("authStatus").innerText =
-    "Invalid credentials ❌";
-}
-
-async function signup() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  const { error } = await supabase.auth.signUp({
+  // 🔐 Supabase login
+  const { error } = await supabase.auth.signInWithPassword({
     email,
     password
   });
 
-  document.getElementById("authStatus").innerText =
-    error ? error.message : "Signup successful ✅";
+  if (error) {
+    setAuthStatus("Invalid credentials ❌");
+  } else {
+    setAuthStatus("Login successful ✅");
+    showDashboard(true);
+    loadStocks();
+  }
 }
 
 async function logout() {
   await supabase.auth.signOut();
-}
-
-function logout() {
+  watchlist = [];
   showDashboard(false);
-  document.getElementById("authStatus").innerText = "Logged out";
+  setAuthStatus("Logged out");
 }
-
 
 /*************************************************
- * 🔐 AUTH STATE LISTENER (SINGLE SOURCE OF TRUTH)
+ * 🔐 AUTH STATE LISTENER
  *************************************************/
-supabase.auth.onAuthStateChange(async (event, session) => {
+supabase.auth.onAuthStateChange((event, session) => {
   if (session) {
     showDashboard(true);
-    await loadWatchlist();
+    loadStocks();
   } else {
     showDashboard(false);
-    watchlist = [];
-    renderWatchlist();
   }
 });
 
-function showDashboard(show) {
-  document.getElementById("dashboard").style.display = show ? "block" : "none";
-}
-
 /*************************************************
- * 🧠 INDICATORS
+ * 📊 STOCK DATA (DEMO)
  *************************************************/
-function calculateRSI(prices) {
-  let gains = 0, losses = 0;
-  for (let i = 1; i < prices.length; i++) {
-    let diff = prices[i] - prices[i - 1];
-    diff > 0 ? (gains += diff) : (losses -= diff);
-  }
-  const rs = gains / (losses || 1);
-  return 100 - 100 / (1 + rs);
-}
+function loadStocks() {
+  // demo stock list (replace with JSON / DB later)
+  allStocks = [
+    { name: "Reliance", symbol: "RELIANCE" },
+    { name: "TCS", symbol: "TCS" },
+    { name: "HDFC Bank", symbol: "HDFCBANK" },
+    { name: "Infosys", symbol: "INFY" }
+  ];
 
-function generatePriceHistory(base) {
-  let prices = [base];
-  for (let i = 0; i < 14; i++) {
-    prices.push(prices[i] + (Math.random() - 0.5) * 20);
-  }
-  return prices;
+  renderStocks(allStocks);
+  renderTopPicks();
 }
 
 /*************************************************
- * ⭐ WATCHLIST (SUPABASE)
- *************************************************/
-async function getUser() {
-  const { data } = await supabase.auth.getUser();
-  return data.user;
-}
-
-async function loadWatchlist() {
-  const user = await getUser();
-  if (!user) return;
-
-  const { data } = await supabase
-    .from("watchlists")
-    .select("symbol")
-    .eq("user_id", user.id);
-
-  watchlist = data.map(d => d.symbol);
-  renderWatchlist();
-  renderStocks(allStocks);
-}
-
-async function toggleWatchlist(symbol) {
-  const user = await getUser();
-  if (!user) {
-    alert("Please login first");
-    return;
-  }
-
-  if (watchlist.includes(symbol)) {
-    await supabase
-      .from("watchlists")
-      .delete()
-      .eq("user_id", user.id)
-      .eq("symbol", symbol);
-
-    watchlist = watchlist.filter(s => s !== symbol);
-  } else {
-    await supabase.from("watchlists").insert([
-      { user_id: user.id, symbol }
-    ]);
-    watchlist.push(symbol);
-  }
-
-  renderWatchlist();
-  renderStocks(allStocks);
-}
-
-function renderWatchlist() {
-  const div = document.getElementById("watchlist");
-  if (!div) return;
-
-  div.innerHTML =
-    "<b>⭐ My Watchlist:</b><br>" +
-    watchlist.map(s => s).join("<br>");
-}
-
-/*************************************************
- * 💰 LIVE PRICE (SIMULATED)
+ * 💰 PRICE SIMULATION
  *************************************************/
 function getLivePrice(symbol) {
   if (!priceMap[symbol]) {
@@ -203,64 +127,46 @@ function getLivePrice(symbol) {
 }
 
 /*************************************************
- * 📊 LOAD STOCKS (JSON FOR NOW)
- *************************************************/
-fetch("data/stocks.json")
-  .then(res => res.json())
-  .then(stocks => {
-    allStocks = stocks.map(stock => {
-      const history = generatePriceHistory(Math.random() * 2000 + 200);
-      const rsi = calculateRSI(history);
-      const momentum = history.at(-1) - history[0];
-
-      let score = 50;
-      if (rsi < 30) score += 25;
-      if (rsi > 70) score -= 20;
-      score += momentum > 0 ? 15 : -10;
-
-      score = Math.max(0, Math.min(100, Math.round(score)));
-
-      let signal =
-        score >= 80 ? "Strong Buy" :
-        score >= 65 ? "Buy" :
-        score <= 35 ? "Sell" : "Hold";
-
-      return { ...stock, score, signal, rsi, momentum };
-    });
-
-    renderStocks(allStocks);
-    renderTop10();
-  });
-
-/*************************************************
- * 📈 RENDER UI
+ * 🖥️ RENDER UI
  *************************************************/
 function renderStocks(stocks) {
-  const container = document.getElementById("stocks");
-  if (!container) return;
+  const div = document.getElementById("stocks");
+  div.innerHTML = "<b>📊 All Stocks</b><br>";
 
-  container.innerHTML = "";
-
-  stocks.forEach(stock => {
-    const div = document.createElement("div");
-    div.className = "stock";
-
-    div.innerHTML = `
-      <h3>${stock.name} (${stock.symbol})</h3>
-      <p>Score: ${stock.score}</p>
-      <p>Signal: ${stock.signal}</p>
-      <p>Live Price: ₹${getLivePrice(stock.symbol)}</p>
-      <button onclick="toggleWatchlist('${stock.symbol}')">
-        ${watchlist.includes(stock.symbol) ? "Remove ⭐" : "Add ⭐"}
-      </button>
+  stocks.forEach(s => {
+    div.innerHTML += `
+      <p>
+        ${s.name} (${s.symbol}) — ₹${getLivePrice(s.symbol)}
+        <button onclick="toggleWatchlist('${s.symbol}')">
+          ${watchlist.includes(s.symbol) ? "Remove ⭐" : "Add ⭐"}
+        </button>
+      </p>
     `;
-    container.appendChild(div);
   });
 }
 
-function renderTop10() {
-  const top = [...allStocks].sort((a,b)=>b.score-a.score).slice(0,10);
+function renderTopPicks() {
   document.getElementById("topPicks").innerHTML =
-    "<b>🏆 Top 10 AI Picks</b><br>" +
-    top.map(s=>`${s.name} (${s.score})`).join("<br>");
+    "<b>🔥 Top Picks</b><br>" +
+    allStocks.map(s => s.name).join("<br>");
+}
+
+function renderWatchlist() {
+  const div = document.getElementById("watchlist");
+  div.innerHTML =
+    "<b>⭐ Watchlist</b><br>" +
+    (watchlist.length ? watchlist.join("<br>") : "Empty");
+}
+
+/*************************************************
+ * ⭐ WATCHLIST (LOCAL FOR NOW)
+ *************************************************/
+function toggleWatchlist(symbol) {
+  if (watchlist.includes(symbol)) {
+    watchlist = watchlist.filter(s => s !== symbol);
+  } else {
+    watchlist.push(symbol);
+  }
+  renderStocks(allStocks);
+  renderWatchlist();
 }
