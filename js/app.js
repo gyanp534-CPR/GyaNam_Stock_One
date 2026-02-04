@@ -137,6 +137,7 @@ return {
     updateAIPrediction();
     renderSectorHeatmap();
     renderWatchlist();   // 👈 ADD THIS
+    renderTomorrowPrediction();
 
 
   });
