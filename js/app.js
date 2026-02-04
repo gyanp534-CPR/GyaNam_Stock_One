@@ -9,6 +9,11 @@ const supabase = supabaseJs.createClient(
   SUPABASE_ANON_KEY
 );
 
+// 🔐 TEMP ADMIN (DEV MODE)
+const ADMIN_EMAIL = "admin@gyanam.ai";
+const ADMIN_PASSWORD = "admin123";
+
+
 /*************************************************
  * 🌍 GLOBAL STATE
  *************************************************/
@@ -40,18 +45,55 @@ async function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  const { error } = await supabase.auth.signInWithPassword({
+  // 🛡️ 1️⃣ ADMIN LOGIN (highest priority)
+  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    document.getElementById("authStatus").innerText =
+      "Admin login successful ✅ (Dev Mode)";
+    showDashboard(true);
+    return;
+  }
+
+  // 🔐 2️⃣ SUPABASE LOGIN (future-ready)
+  if (typeof supabase !== "undefined") {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (!error) {
+      document.getElementById("authStatus").innerText =
+        "Login successful ✅";
+      return;
+    }
+  }
+
+  // ❌ 3️⃣ FAIL SAFE
+  document.getElementById("authStatus").innerText =
+    "Invalid credentials ❌";
+}
+
+async function signup() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { error } = await supabase.auth.signUp({
     email,
     password
   });
 
   document.getElementById("authStatus").innerText =
-    error ? error.message : "Logged in ✅";
+    error ? error.message : "Signup successful ✅";
 }
 
 async function logout() {
   await supabase.auth.signOut();
 }
+
+function logout() {
+  showDashboard(false);
+  document.getElementById("authStatus").innerText = "Logged out";
+}
+
 
 /*************************************************
  * 🔐 AUTH STATE LISTENER (SINGLE SOURCE OF TRUTH)
