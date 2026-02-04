@@ -2,215 +2,140 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Gyanam — Test Auth</title>
+  <title>Gyanam — Auth Test</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body { font-family: Arial, sans-serif; padding: 18px; background:#0f1724; color:#e6eef8; }
+    body { font-family: Arial, sans-serif; padding:18px; background:#0f1724; color:#e6eef8; }
     input { padding:8px; margin:6px 0; width:280px; display:block; }
     button { padding:8px 12px; margin:6px 6px 6px 0; cursor:pointer; }
     .dashboard-box { padding:10px; margin:8px 0; background:#0b1220; border:1px solid #233044; border-radius:6px; }
-    .controls { margin:10px 0 18px 0; }
     h1,h2 { margin:8px 0; color:#bfe3ff; }
     #authStatus { margin-top:6px; color:#ffd; }
-    a.small { color:#9ecbff; font-size:13px }
   </style>
 </head>
 <body>
 
-  <h1>🧠 Gyanam — Auth Test</h1>
+<h1>🧠 Gyanam — Auth Test</h1>
 
-  <!-- AUTH UI -->
-  <div id="authArea" class="dashboard-box">
-    <h2>🔐 Authentication</h2>
+<!-- 🔐 AUTH -->
+<div id="authArea" class="dashboard-box">
+  <h2>🔐 Authentication</h2>
 
-    <label> Email (test)</label>
-    <input type="email" id="email" placeholder="Email">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
 
-    <label> Password</label>
-    <input type="password" id="password" placeholder="Password">
+  <button id="btnSignup">Sign Up (Supabase)</button>
+  <button id="btnLogin">Login (Admin / Supabase)</button>
 
-    <!-- Buttons: one unified login that tries admin then Supabase -->
-    <div>
-      <button id="btnSignup">Sign Up (Supabase)</button>
-      <button id="btnLogin">Login (Admin or Supabase)</button>
-    </div>
+  <div id="authStatus">Status: waiting…</div>
+</div>
 
-    <div id="authStatus">Status: waiting...</div>
-    <div style="margin-top:6px"><a class="small" href="#" id="clearConsole">Show debug steps</a></div>
-  </div>
+<!-- 🚀 DASHBOARD -->
+<div id="dashboard" style="display:none;">
+  <button id="btnLogout">Logout</button>
+  <h2>🎉 Dashboard unlocked</h2>
 
-  <!-- DASHBOARD (hidden until auth) -->
-  <div id="dashboard" style="display:none;">
-    <button id="btnLogout">Logout</button>
-    <h2>🎉 Dashboard — You are logged in</h2>
+  <div class="dashboard-box">You are logged in successfully.</div>
+</div>
 
-    <div id="topPicks" class="dashboard-box">Top picks will show here.</div>
-    <div id="watchlist" class="dashboard-box">Watchlist will show here.</div>
+<!-- ✅ Supabase JS (ONLY ONCE) -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-    <h3>Quick test controls</h3>
-    <div class="controls">
-      <input id="dummy" placeholder="Just a dummy input to test UI">
-    </div>
-  </div>
+<script>
+/* =========================
+   CONFIG
+========================= */
+const SUPABASE_URL = "https://xfavhimibtbkshzxwyss.supabase.co";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE"; // optional for now
 
-  <!-- Supabase client -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+const ADMIN_EMAIL = "admin@gyanam.ai";
+const ADMIN_PASSWORD = "admin123";
 
-  <script>
-  /*******************************
-   * CONFIG - paste your anon key
-   *******************************/
-  <script> src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script>
-  const SUPABASE_URL = "https://xfavhimibtbkshzxwyss.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmYXZoaW1pYnRia3Noenh3eXNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxODAxOTIsImV4cCI6MjA4NTc1NjE5Mn0.wOa0aQyp4kRh8v6ShncJ7fW6nV6hTTpOG4gw61WQrTM"; // <<< REPLACE THIS with your anon key
-  </script>
-  /*******************************
-   * DEV admin credentials (temporary)
-   *******************************/
-  const ADMIN_EMAIL = "admin@gyanam.ai";
-  const ADMIN_PASSWORD = "admin123";
+/* =========================
+   INIT
+========================= */
+const supabase = supabaseJs.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
 
-  /*******************************
-   * INIT
-   *******************************/
-  console.log("app: starting");
-  const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  let watchlist = [];
+function info(msg){
+  document.getElementById("authStatus").innerText = "Status: " + msg;
+}
 
-  /*******************************
-   * HELPERS for UI & debug
-   *******************************/
-  function info(msg){
-    const el = document.getElementById("authStatus");
-    if (el) el.innerText = "Status: " + msg;
-    console.log("auth:", msg);
+function showDashboard(show){
+  document.getElementById("dashboard").style.display = show ? "block" : "none";
+  document.getElementById("authArea").style.display = show ? "none" : "block";
+}
+
+/* =========================
+   LOGIN
+========================= */
+async function loginHandler(){
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  // Admin login (dev)
+  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD){
+    info("Admin login successful ✅");
+    showDashboard(true);
+    return;
   }
 
-  function showDashboard(show){
-    document.getElementById("dashboard").style.display = show ? "block" : "none";
-    document.getElementById("authArea").style.display = show ? "none" : "block";
+  // Supabase login
+  if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes("PASTE")){
+    info("Supabase anon key missing. Admin only.");
+    return;
   }
 
-  /*******************************
-   * LOGIN (dual strategy)
-   *******************************/
-  async function loginHandler() {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
+  info("Trying Supabase login…");
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error){
+    info("Login failed: " + error.message);
+  } else {
+    info("Supabase login successful ✅");
+    showDashboard(true);
+  }
+}
 
-    console.log("login: clicked", {email});
+/* =========================
+   SIGNUP
+========================= */
+async function signupHandler(){
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-    // 1) Admin quick login (local)
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      info("Admin login successful ✅ (dev)");
-      showDashboard(true);
-      return;
-    }
-
-    // 2) Try Supabase login (if anon key provided)
-    if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes("PASTE_YOUR_REAL")) {
-      info("Supabase anon key missing. Admin fallback only.");
-      return;
-    }
-
-    info("Trying Supabase login...");
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        console.warn("supabase login error:", error.message);
-        info("Supabase login failed: " + error.message);
-      } else {
-        info("Supabase login successful ✅");
-        showDashboard(true);
-      }
-    } catch (e) {
-      console.error("supabase login exception", e);
-      info("Supabase exception, check console");
-    }
+  if (!email || !password){
+    info("Email & password required");
+    return;
   }
 
-  /*******************************
-   * SIGNUP (Supabase)
-   *******************************/
-  async function signupHandler() {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    if (!email || !password) {
-      info("Provide email & password to sign up");
-      return;
-    }
-    if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes("PASTE_YOUR_REAL")) {
-      info("Supabase anon key missing — signup disabled.");
-      return;
-    }
-
-    info("Creating account (Supabase)...");
-    try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) {
-        console.warn("signup error:", error.message);
-        info("Signup failed: " + error.message);
-      } else {
-        console.log("signup success", data);
-        info("Signup created — check email or try Login");
-      }
-    } catch (e) {
-      console.error("signup exception", e);
-      info("Signup exception, see console");
-    }
+  const { error } = await supabase.auth.signUp({ email, password });
+  if (error){
+    info("Signup failed: " + error.message);
+  } else {
+    info("Signup successful — now login");
   }
+}
 
-  /*******************************
-   * LOGOUT
-   *******************************/
-  async function logoutHandler(){
-    // If using supabase session, sign out there too
-    try {
-      if (SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes("PASTE_YOUR_REAL")) {
-        await supabase.auth.signOut();
-      }
-    } catch(e){
-      console.warn("logout supabase error", e);
-    }
-    info("Logged out");
-    showDashboard(false);
-  }
+/* =========================
+   LOGOUT
+========================= */
+async function logoutHandler(){
+  await supabase.auth.signOut();
+  info("Logged out");
+  showDashboard(false);
+}
 
-  /*******************************
-   * Attach events AFTER DOM ready
-   *******************************/
-  document.addEventListener("DOMContentLoaded", () => {
-    console.log("app: DOM ready");
-    // Buttons
-    document.getElementById("btnLogin").addEventListener("click", loginHandler);
-    document.getElementById("btnSignup").addEventListener("click", signupHandler);
-    document.getElementById("btnLogout").addEventListener("click", logoutHandler);
+/* =========================
+   EVENTS
+========================= */
+document.getElementById("btnLogin").addEventListener("click", loginHandler);
+document.getElementById("btnSignup").addEventListener("click", signupHandler);
+document.getElementById("btnLogout").addEventListener("click", logoutHandler);
 
-    document.getElementById("clearConsole").addEventListener("click", (e)=>{
-      e.preventDefault();
-      alert("Open DevTools (F12) → Console to see debug logs. If nothing appears, check network or script loading.");
-    });
+info("Ready. Use admin@gyanam.ai / admin123");
+</script>
 
-    info("Ready. Use admin@gyanam.ai / admin123 to test (or paste Supabase anon key above).");
-
-    // Optional: show any existing session
-    // If Supabase session exists, show dashboard
-    (async ()=>{
-      try {
-        const { data } = await supabase.auth.getSession();
-        if (data?.session) {
-          console.log("existing supabase session found");
-          showDashboard(true);
-          info("Restored session");
-        }
-      } catch(e){
-        console.warn("session check failed", e);
-      }
-    })();
-  });
-  </script>
 </body>
 </html>
-
