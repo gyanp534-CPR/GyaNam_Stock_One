@@ -274,3 +274,20 @@ function applyFilters() {
 }
 
 }
+function renderTomorrowPrediction() {
+  const bullish = allStocks.filter(s => s.trend === "Bullish").length;
+  const bearish = allStocks.filter(s => s.trend === "Bearish").length;
+  const total = allStocks.length;
+
+  const probability = Math.round((bullish / total) * 100);
+
+  let outlook = "Sideways";
+  if (probability > 60) outlook = "Bullish 📈";
+  else if (probability < 40) outlook = "Bearish 📉";
+
+  document.getElementById("tomorrowPrediction").innerHTML = `
+    <b>Market Outlook:</b> ${outlook}<br>
+    <b>Confidence:</b> ${probability}%
+  `;
+}
+
