@@ -139,6 +139,8 @@ return {
     renderWatchlist();   // 👈 ADD THIS
     renderTomorrowPrediction();
     renderIndex();
+    renderTop10();
+
 
   });
 
@@ -322,3 +324,17 @@ function renderIndex() {
     BANKNIFTY: ${bank}
   `;
 }
+
+function renderTop10() {
+  const top10 = [...allStocks]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
+
+  let html = "<b>🏆 Top 10 AI Stocks Today:</b><br>";
+  top10.forEach(s => {
+    html += `${s.name} (${s.symbol}) — ${s.score}<br>`;
+  });
+
+  document.getElementById("topPicks").innerHTML = html;
+}
+
