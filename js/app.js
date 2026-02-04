@@ -1,5 +1,3 @@
-// js/app.js - REPLACE your current file with this exact content
-
 /* --------------------------
    Utilities & Indicators
    -------------------------- */
