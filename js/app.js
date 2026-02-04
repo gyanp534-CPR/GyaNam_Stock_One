@@ -460,3 +460,17 @@ async function toggleWatchlist(symbol) {
   renderStocks(allStocks);
   renderWatchlist();
 }
+
+function showDashboard(show) {
+  document.getElementById("dashboard").style.display = show ? "block" : "none";
+}
+
+supabase.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    showDashboard(true);
+    loadWatchlist();
+  } else {
+    showDashboard(false);
+  }
+});
+
