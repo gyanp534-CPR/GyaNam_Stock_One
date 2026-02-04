@@ -1,3 +1,11 @@
+const SUPABASE_URL = "https://xfavhimibtbkshzxwyss.supabase.co";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";
+
+const supabase = supabaseJs.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
 /* --------------------------
    Utilities & Indicators
    -------------------------- */
