@@ -6,6 +6,7 @@ const supabase = supabaseJs.createClient(
   SUPABASE_ANON_KEY
 );
 
+
 /* --------------------------
    Utilities & Indicators
    -------------------------- */
@@ -396,4 +397,20 @@ function runBacktest() {
   });
   const el = document.getElementById("backtestResult");
   if (el) el.innerHTML = `<b>Backtest Result:</b><br>Strategy Return: ${profit}%`;
+}
+
+async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    document.getElementById("authStatus").innerText = error.message;
+  } else {
+    document.getElementById("authStatus").innerText = "Logged in ✅";
+  }
 }
