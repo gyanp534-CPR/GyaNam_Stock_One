@@ -95,6 +95,12 @@ let momentum = history[history.length - 1] - history[0];
 
 let score = 50;
 
+const strategy =
+  document.getElementById("strategyMode")?.value || "balanced";
+
+if (strategy === "aggressive") score += 10;
+if (strategy === "conservative") score -= 5;
+
 // RSI logic
 if (rsi < 30) score += 25;        // oversold → bullish
 else if (rsi > 70) score -= 20;   // overbought → bearish
