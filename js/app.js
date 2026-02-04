@@ -173,8 +173,8 @@ function renderStocks(stocks) {
     let trendClass = stock.trend.toLowerCase();
 
     div.innerHTML = `
-  <<h3 onclick="loadChart('${stock.symbol}'); renderAIExplanation(${JSON.stringify(stock)})" style="cursor:pointer;
-style="cursor:pointer;">
+  <h3 onclick="loadChart('${stock.symbol}'); renderAIExplanation(${JSON.stringify(stock)})" style="cursor:pointer;">
+
   ${stock.name} (${stock.symbol})
 </h3>
 
