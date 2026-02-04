@@ -1,142 +1,116 @@
-<div id="dashboard" style="display:none;">
-  <!-- 🔽 YAHAN tumhara poora dashboard content rahega -->
-</div>
-
 <body>
-  <h1>🧠 Gyanam – India AI Stock Intelligence</h1>
 
+  <!-- 🔐 LOGIN SECTION -->
   <h2>🔐 Login</h2>
-<input type="email" id="email" placeholder="Email">
-<input type="password" id="password" placeholder="Password">
-<button onclick="login()">Login</button>
-<div id="authStatus"></div>
-  
- <h2>📊 Market Index</h2>
-<div id="indexBox" class="dashboard-box"></div>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <div id="authStatus"></div>
 
-  <h2>📈 Stock Chart</h2>
-<div id="tv-chart" style="height:400px;"></div>
+  <!-- 🚀 DASHBOARD (HIDDEN UNTIL LOGIN) -->
+  <div id="dashboard" style="display:none;">
 
-  <h2>📈 Market Dashboard</h2>
-<div id="marketBox" class="dashboard-box">
-  Loading market data...
-</div>
+    <button onclick="logout()">Logout</button>
 
-<h2>🤖 AI Prediction</h2>
-<div id="aiPrediction" class="dashboard-box">
-  Calculating AI signals...
-</div>
+    <h1>🧠 Gyanam – India AI Stock Intelligence</h1>
 
-  <h2>🔮 AI Tomorrow Prediction</h2>
-<div id="tomorrowPrediction" class="dashboard-box"></div>
+    <h2>📊 Market Index</h2>
+    <div id="indexBox" class="dashboard-box"></div>
 
-  <div class="controls">
-  <input type="text" id="searchBox" placeholder="Search stock...">
+    <h2>📈 Stock Chart</h2>
+    <div id="tv-chart" style="height:400px;"></div>
+
+    <h2>📈 Market Dashboard</h2>
+    <div id="marketBox" class="dashboard-box">Loading market data...</div>
+
+    <h2>🤖 AI Prediction</h2>
+    <div id="aiPrediction" class="dashboard-box">Calculating AI signals...</div>
+
+    <h2>🔮 AI Tomorrow Prediction</h2>
+    <div id="tomorrowPrediction" class="dashboard-box"></div>
 
     <h2>📰 News Sentiment</h2>
-<div id="newsSentiment" class="dashboard-box"></div>
+    <div id="newsSentiment" class="dashboard-box"></div>
 
     <h2>📈 AI Backtesting</h2>
-<div class="dashboard-box">
-  <button onclick="runBacktest()">Run Backtest</button>
-  <div id="backtestResult"></div>
-</div>
+    <div class="dashboard-box">
+      <button onclick="runBacktest()">Run Backtest</button>
+      <div id="backtestResult"></div>
+    </div>
 
+    <div class="controls">
+      <input type="text" id="searchBox" placeholder="Search stock...">
 
-  <select id="sectorFilter">
-    <option value="ALL">All Sectors</option>
-    <option value="Banking">Banking</option>
-    <option value="IT">IT</option>
-    <option value="Pharma">Pharma</option>
-    <option value="Energy">Energy</option>
-  </select>
+      <select id="sectorFilter">
+        <option value="ALL">All Sectors</option>
+        <option value="Banking">Banking</option>
+        <option value="IT">IT</option>
+        <option value="Pharma">Pharma</option>
+        <option value="Energy">Energy</option>
+      </select>
 
-  <button onclick="filterStocks('ALL')">All</button>
-  <button onclick="filterStocks('Bullish')">Bullish</button>
-  <button onclick="filterStocks('Bearish')">Bearish</button>
-  <button onclick="filterStocks('Strong Buy')">Strong Buy</button>
-</div>
+      <button onclick="filterStocks('ALL')">All</button>
+      <button onclick="filterStocks('Bullish')">Bullish</button>
+      <button onclick="filterStocks('Bearish')">Bearish</button>
+      <button onclick="filterStocks('Strong Buy')">Strong Buy</button>
+    </div>
 
-  <h2>🔥 Top AI Picks</h2>
-  <div id="topPicks" class="top-picks"></div>
+    <h2>🔥 Top AI Picks</h2>
+    <div id="topPicks" class="top-picks"></div>
 
-  <h2>⭐ Watchlist</h2><div id="watchlist" class="dashboard-box"></div>
- 
-  <h2>⚡ AI Signals Today</h2>
-  <div id="aiSignals" class="dashboard-box"></div>
+    <h2>⭐ Watchlist</h2>
+    <div id="watchlist" class="dashboard-box"></div>
 
-  <h2>🧠 AI Explanation</h2>
-<div id="aiExplanation" class="dashboard-box"></div>
+    <h2>⚡ AI Signals Today</h2>
+    <div id="aiSignals" class="dashboard-box"></div>
 
-  <h2>🌐 Sector Heatmap</h2>
-<div id="sectorHeatmap" class="dashboard-box"></div>
+    <h2>🧠 AI Explanation</h2>
+    <div id="aiExplanation" class="dashboard-box"></div>
 
-  <h2>💼 Portfolio Simulator</h2>
-<div class="dashboard-box">
-  <input type="number" id="investmentAmount" placeholder="Investment ₹">
-  <button onclick="simulatePortfolio()">Simulate</button>
-  <div id="portfolioResult"></div>
-</div>
-<select id="strategyMode">
-  <option value="balanced">Balanced</option>
-  <option value="aggressive">Aggressive</option>
-  <option value="conservative">Conservative</option>
-</select>
+    <h2>🌐 Sector Heatmap</h2>
+    <div id="sectorHeatmap" class="dashboard-box"></div>
 
-  <h2>📊 All Stocks</h2>
-  <div id="stocks"></div>
+    <h2>💼 Portfolio Simulator</h2>
+    <div class="dashboard-box">
+      <input type="number" id="investmentAmount" placeholder="Investment ₹">
+      <button onclick="simulatePortfolio()">Simulate</button>
+      <div id="portfolioResult"></div>
+    </div>
 
-   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-   <script src="js/app.js"></script>
+    <select id="strategyMode">
+      <option value="balanced">Balanced</option>
+      <option value="aggressive">Aggressive</option>
+      <option value="conservative">Conservative</option>
+    </select>
+
+    <h2>📊 All Stocks</h2>
+    <div id="stocks"></div>
+
+  </div>
+
+  <!-- 🔗 SCRIPTS -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/app.js"></script>
   <script src="https://s3.tradingview.com/tv.js"></script>
-<script>
-let tvWidget;
-function loadChart(symbol) {
-  if (tvWidget) tvWidget.remove();
 
-  tvWidget = new TradingView.widget({
-    width: "100%",
-    height: 400,
-    symbol: "BSE:" + symbol,
-    interval: "D",
-    timezone: "Asia/Kolkata",
-    theme: "dark",
-    style: "1",
-    container_id: "tv-chart"
-  });
-}
-
-window.onload = function() {
-  loadChart("RELIANCE");
-};
-</script>
-
-<button onclick="logout()">Logout</button>
+  <script>
+    let tvWidget;
+    function loadChart(symbol) {
+      if (tvWidget) tvWidget.remove();
+      tvWidget = new TradingView.widget({
+        width: "100%",
+        height: 400,
+        symbol: "BSE:" + symbol,
+        interval: "D",
+        timezone: "Asia/Kolkata",
+        theme: "dark",
+        style: "1",
+        container_id: "tv-chart"
+      });
+    }
+    window.onload = function () {
+      loadChart("RELIANCE");
+    };
+  </script>
 
 </body>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
