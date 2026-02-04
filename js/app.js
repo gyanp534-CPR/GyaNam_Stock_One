@@ -338,3 +338,18 @@ function renderTop10() {
   document.getElementById("topPicks").innerHTML = html;
 }
 
+function renderAIExplanation(stock) {
+  let reasons = [];
+
+  if (stock.rsi < 30) reasons.push("RSI oversold (bullish signal)");
+  if (stock.rsi > 70) reasons.push("RSI overbought (risk)");
+  if (stock.momentum > 0) reasons.push("Positive momentum");
+  if (stock.momentum < 0) reasons.push("Negative momentum");
+  if (stock.sector === "Banking") reasons.push("Strong banking sector bias");
+
+  document.getElementById("aiExplanation").innerHTML = `
+    <b>${stock.name} (${stock.symbol})</b><br>
+    Signal: ${stock.signal}<br>
+    Reasons:<br>• ${reasons.join("<br>• ")}
+  `;
+}
