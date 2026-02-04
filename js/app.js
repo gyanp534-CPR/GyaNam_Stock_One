@@ -292,3 +292,23 @@ function renderTomorrowPrediction() {
   `;
 }
 
+function simulatePortfolio() {
+  const amount = Number(document.getElementById("investmentAmount").value);
+  if (!amount || watchlist.length === 0) {
+    document.getElementById("portfolioResult").innerText =
+      "Enter amount & add stocks to watchlist";
+    return;
+  }
+
+  let gain = 0;
+  watchlist.forEach(sym => {
+    const stock = allStocks.find(s => s.symbol === sym);
+    if (stock.signal === "Strong Buy") gain += amount * 0.08;
+    else if (stock.signal === "Buy") gain += amount * 0.04;
+    else if (stock.signal === "Sell") gain -= amount * 0.03;
+  });
+
+  document.getElementById("portfolioResult").innerHTML = `
+    <b>Estimated P/L:</b> ₹${gain.toFixed(0)}
+  `;
+}
