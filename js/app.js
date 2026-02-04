@@ -138,7 +138,7 @@ return {
     renderSectorHeatmap();
     renderWatchlist();   // 👈 ADD THIS
     renderTomorrowPrediction();
-
+    renderIndex();
 
   });
 
@@ -310,5 +310,15 @@ function simulatePortfolio() {
 
   document.getElementById("portfolioResult").innerHTML = `
     <b>Estimated P/L:</b> ₹${gain.toFixed(0)}
+  `;
+}
+
+function renderIndex() {
+  const nifty = (Math.random() * 200 - 100).toFixed(2);
+  const bank = (Math.random() * 200 - 100).toFixed(2);
+
+  document.getElementById("indexBox").innerHTML = `
+    NIFTY: ${nifty} <br>
+    BANKNIFTY: ${bank}
   `;
 }
