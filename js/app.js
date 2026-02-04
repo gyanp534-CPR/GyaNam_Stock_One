@@ -139,8 +139,7 @@ return {
     renderWatchlist();   // 👈 ADD THIS
     renderTomorrowPrediction();
     renderIndex();
-    
-
+    renderNewsSentiment();
 
   });
 
@@ -354,3 +353,13 @@ function renderAIExplanation(stock) {
     Reasons:<br>• ${reasons.join("<br>• ")}
   `;
 }
+
+function renderNewsSentiment() {
+  const sentiments = ["Positive 🟢", "Neutral 🟡", "Negative 🔴"];
+  const pick = sentiments[Math.floor(Math.random() * sentiments.length)];
+
+  document.getElementById("newsSentiment").innerHTML = `
+    Market News Sentiment: <b>${pick}</b>
+  `;
+}
+
