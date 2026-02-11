@@ -1,67 +1,109 @@
 /*************************************************
- * 🔐 SUPABASE CONFIG (PUBLIC READ ONLY)
- *************************************************/
+ SUPABASE CONNECTION (ONLY ONCE)
+*************************************************/
 const SUPABASE_URL = "https://xfavhimibtbkshzxwyss.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmYXZoaW1pYnRia3Noenh3eXNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxODAxOTIsImV4cCI6MjA4NTc1NjE5Mn0.wOa0aQyp4kRh8v6ShncJ7fW6nV6hTTpOG4gw61WQrTM";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY";
 
 const supabase = supabaseJs.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
-/*************************************************
- * 🌍 STATE
- *************************************************/
-let stocks = [];
+console.log("Supabase connected");
+
 
 /*************************************************
- * 📊 FETCH FROM SUPABASE
- *************************************************/
-async function fetchStocks() {
-  console.log("Fetching stocks from Supabase…");
+ GLOBAL STATE
+*************************************************/
+let allStocks = [];
+
+
+/*************************************************
+ LOAD STOCKS FROM SUPABASE
+*************************************************/
+async function loadStocks() {
+  document.getElementById("status").innerText = "Fetching from Supabase...";
 
   const { data, error } = await supabase
     .from("stocks")
-    .select("symbol, name, sector");
+    .select("*");
 
   if (error) {
-    console.error("Supabase error:", error);
-    document.getElementById("stocks").innerText =
-      "❌ Failed to load stocks. Check RLS / table.";
+    console.error(error);
+    document.getElementById("status").innerText =
+      "Error loading stocks from Supabase";
     return;
   }
 
-  console.log("Stocks received:", data);
-  stocks = data;
+  allStocks = data;
+
+  document.getElementById("status").innerText =
+    "Loaded " + allStocks.length + " stocks from Supabase";
+
+  calculateAI();
   renderStocks();
+  renderTop10();
 }
 
+
 /*************************************************
- * 🖥️ RENDER
- *************************************************/
+ AI SCORE CALCULATION
+*************************************************/
+function calculateAI() {
+  allStocks = allStocks.map(stock => {
+
+    let score = 50 + Math.floor(Math.random() * 50);
+
+    let signal =
+      score > 80 ? "Strong Buy" :
+      score > 65 ? "Buy" :
+      score < 35 ? "Sell" :
+      "Hold";
+
+    return {
+      ...stock,
+      score,
+      signal
+    };
+  });
+}
+
+
+/*************************************************
+ RENDER ALL STOCKS
+*************************************************/
 function renderStocks() {
   const container = document.getElementById("stocks");
   container.innerHTML = "";
 
-  if (!stocks.length) {
-    container.innerText = "No stocks found.";
-    return;
-  }
-
-  stocks.forEach(s => {
-    const div = document.createElement("div");
-    div.className = "stock";
-    div.innerHTML = `
-      <b>${s.name} (${s.symbol})</b><br>
-      Sector: ${s.sector}
+  allStocks.forEach(stock => {
+    container.innerHTML += `
+      <div style="margin-bottom:10px;">
+        <b>${stock.name} (${stock.symbol})</b><br>
+        Sector: ${stock.sector}<br>
+        AI Score: ${stock.score}<br>
+        Signal: ${stock.signal}
+      </div>
+      <hr>
     `;
-    container.appendChild(div);
   });
 }
 
+
 /*************************************************
- * ▶️ START APP
- *************************************************/
-document.addEventListener("DOMContentLoaded", () => {
-  fetchStocks();
-});
+ TOP 10
+*************************************************/
+function renderTop10() {
+  const top = [...allStocks]
+    .sort((a,b) => b.score - a.score)
+    .slice(0,10);
+
+  document.getElementById("topPicks").innerHTML =
+    top.map(s => `${s.name} (${s.score})`).join("<br>");
+}
+
+
+/*************************************************
+ START APP
+*************************************************/
+loadStocks();
