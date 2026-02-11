@@ -4,7 +4,7 @@
 const SUPABASE_URL = "https://xfavhimibtbkshzxwyss.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmYXZoaW1pYnRia3Noenh3eXNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxODAxOTIsImV4cCI6MjA4NTc1NjE5Mn0.wOa0aQyp4kRh8v6ShncJ7fW6nV6hTTpOG4gw61WQrTM";
 
-var supabase = createClient(
+const db = createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
