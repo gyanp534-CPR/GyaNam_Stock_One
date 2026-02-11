@@ -1,44 +1,44 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <title>🧠 Gyanam – India AI Stock Intelligence</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Gyanam – India AI Stock Intelligence</title>
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background:#0f1724;
-      color:#e6eef8;
-      padding:16px;
-    }
-    h1,h2 { color:#bfe3ff; }
-    .box {
+      font-family: Arial;
       background:#0b1220;
-      border:1px solid #233044;
-      border-radius:8px;
+      color:#e6eef8;
+      padding:20px;
+    }
+    .box {
       padding:12px;
       margin:10px 0;
+      border:1px solid #233044;
+      border-radius:8px;
     }
-    .stock {
-      border-bottom:1px solid #233044;
-      padding:8px 0;
-    }
+    h1 { color:#8bd3ff; }
   </style>
 </head>
-
 <body>
 
 <h1>🧠 Gyanam – India AI Stock Intelligence</h1>
 
-<h2>📊 All Stocks (Supabase)</h2>
-<div id="stocks" class="box">Loading stocks…</div>
+<div class="box">
+  <b>Status:</b> <span id="status">Loading Supabase data...</span>
+</div>
 
-<!-- Supabase client (ONLY ONCE) -->
+<h2>🏆 Top AI Picks</h2>
+<div id="topPicks" class="box"></div>
+
+<h2>📊 All Stocks</h2>
+<div id="stocks" class="box"></div>
+
+<!-- SUPABASE LOAD ONLY ONCE -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-<!-- App logic -->
-<script src="app.js"></script>
+<!-- YOUR APP -->
+<script src="js/app.js"></script>
 
 </body>
 </html>
