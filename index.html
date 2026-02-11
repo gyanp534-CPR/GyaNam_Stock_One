@@ -1,43 +1,28 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <title>🧠 Gyanam – India AI Stock Intelligence</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 16px;
       background:#0f1724;
       color:#e6eef8;
+      padding:16px;
     }
     h1,h2 { color:#bfe3ff; }
-    .dashboard-box {
-      padding:12px;
-      margin:10px 0;
+    .box {
       background:#0b1220;
       border:1px solid #233044;
       border-radius:8px;
+      padding:12px;
+      margin:10px 0;
     }
     .stock {
-      padding:10px;
-      margin:8px 0;
-      border:1px solid #233044;
-      border-radius:6px;
-      background:#0b1220;
-    }
-    button {
-      padding:6px 10px;
-      cursor:pointer;
-      margin-top:4px;
-    }
-    .bullish { color:#4ade80; }
-    .bearish { color:#f87171; }
-    .neutral { color:#facc15; }
-    input, select {
-      padding:6px;
-      margin-right:6px;
+      border-bottom:1px solid #233044;
+      padding:8px 0;
     }
   </style>
 </head>
@@ -46,45 +31,13 @@
 
 <h1>🧠 Gyanam – India AI Stock Intelligence</h1>
 
-<h2>📊 Market Index</h2>
-<div id="indexBox" class="dashboard-box"></div>
+<h2>📊 All Stocks (Supabase)</h2>
+<div id="stocks" class="box">Loading stocks…</div>
 
-<h2>📈 Market Dashboard</h2>
-<div id="marketBox" class="dashboard-box"></div>
+<!-- Supabase client (ONLY ONCE) -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-<h2>🤖 AI Market Prediction</h2>
-<div id="aiPrediction" class="dashboard-box"></div>
-
-<h2>🔮 Tomorrow Outlook</h2>
-<div id="tomorrowPrediction" class="dashboard-box"></div>
-
-<h2>🔍 Filters</h2>
-<div class="dashboard-box">
-  <input type="text" id="searchBox" placeholder="Search stock">
-  <select id="sectorFilter">
-    <option value="ALL">All Sectors</option>
-    <option value="Banking">Banking</option>
-    <option value="IT">IT</option>
-    <option value="Energy">Energy</option>
-  </select>
-</div>
-
-<h2>🔥 Top AI Picks</h2>
-<div id="topPicks" class="dashboard-box"></div>
-
-<h2>⭐ Watchlist</h2>
-<div id="watchlist" class="dashboard-box"></div>
-
-<h2>⚡ AI Signals Today</h2>
-<div id="aiSignals" class="dashboard-box"></div>
-
-<h2>🌐 Sector Heatmap</h2>
-<div id="sectorHeatmap" class="dashboard-box"></div>
-
-<h2>📊 All Stocks</h2>
-<div id="stocks"></div>
-
-<!-- MAIN JS -->
+<!-- App logic -->
 <script src="app.js"></script>
 
 </body>
